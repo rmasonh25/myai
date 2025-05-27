@@ -1,0 +1,28 @@
+name: Sync Fork with Upstream
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Runs daily at 2:00 AM UTC
+  workflow_dispatch:      # Allows manual trigger from Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout forked repo
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Change this if your default branch is not 'main'
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+
+      - name: Add upstream repo
+        run: |
+          git remote add upstream https://github.com/rmasonhx12/myai.git
+          git fetch upstream
+          git checkout main
+          git merge upstream/main --allow-unrelated-histories || true
+          git push origin main
